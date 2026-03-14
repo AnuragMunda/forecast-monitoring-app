@@ -80,15 +80,21 @@ export const buildSeries = (
   forecastMap: Map<string, WindGenerationForecast[]>,
   horizon: number,
 ): ChartData[] => {
-  return actuals.map((a) => {
-    const forecastsForTarget = forecastMap.get(a.startTime) || [];
+  return actuals
+    .map((a) => {
+      const forecastsForTarget = forecastMap.get(a.startTime) || [];
 
-    const forecast = selectForecast(forecastsForTarget, a.startTime, horizon);
+      const forecast = selectForecast(forecastsForTarget, a.startTime, horizon);
 
-    return {
-      startTime: a.startTime,
-      actualGeneration: a.generation,
-      forecastedGeneration: forecast?.generation ?? null,
-    };
-  }).filter((d) => d.forecastedGeneration != null);
+      return {
+        startTime: a.startTime,
+        actualGeneration: a.generation,
+        forecastedGeneration: forecast?.generation ?? null,
+      };
+    })
+    .filter((d) => d.forecastedGeneration != null)
+    .sort(
+      (a, b) =>
+        new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
+    );
 };

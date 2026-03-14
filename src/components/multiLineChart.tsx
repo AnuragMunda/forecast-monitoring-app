@@ -1,7 +1,8 @@
-"use client"
+"use client";
 
-import { TrendingUp } from "lucide-react"
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
+import { TrendingUp } from "lucide-react";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import { ChartData } from "@/lib/types";
 
 import {
   Card,
@@ -10,42 +11,64 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "@/components/ui/chart"
+} from "@/components/ui/chart";
+import { DateRange } from "react-day-picker";
 
-export const description = "A multiple line chart"
-
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-]
+export const description = "A multiple line chart";
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  actualGeneration: {
+    label: "Actual value",
     color: "var(--chart-1)",
   },
-  mobile: {
-    label: "Mobile",
+  forecastedGeneration: {
+    label: "Forecasted value",
     color: "var(--chart-2)",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
-export function MultiLineChart() {
+const formatXAxis = (value: string) => {
+  const date = new Date(value);
+
+  const hours = date.getUTCHours();
+  const minutes = date.getUTCMinutes();
+
+  // Show date at midnight
+  if (hours === 0 && minutes === 0) {
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+    });
+  }
+
+  // Otherwise show time
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+export function MultiLineChart({
+  chartData,
+  date,
+}: {
+  chartData: ChartData[];
+  date: DateRange | undefined;
+}) {
   return (
-    <Card className="w-[50%] mt-10">
+    <Card className="w-[95%] md:w-[60%] mt-10">
       <CardHeader>
-        <CardTitle>Line Chart - Multiple</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>Forecast for Jan 2024</CardTitle>
+        <CardDescription>
+          {date?.from ? date.from.toDateString() : ""} -{" "}
+          {date?.to ? date.to.toDateString() : ""}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -53,37 +76,51 @@ export function MultiLineChart() {
             accessibilityLayer
             data={chartData}
             margin={{
-              left: 12,
+              left: 0,
               right: 12,
             }}
           >
             <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
+            <YAxis
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickFormatter={(value) =>
+                value === 0 ? "0" : `${value / 1000}k`
+              }
             />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+            <XAxis
+              dataKey="startTime"
+              type="category"
+              // interval="preserveStartEnd"
+              tickLine={true}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={formatXAxis}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent />}
+              labelFormatter={(value) => new Date(value).toLocaleString()}
+            />
             <Line
-              dataKey="desktop"
+              dataKey="actualGeneration"
               type="monotone"
-              stroke="var(--color-desktop)"
+              stroke="var(--color-actualGeneration)"
               strokeWidth={2}
               dot={false}
             />
             <Line
-              dataKey="mobile"
+              dataKey="forecastedGeneration"
               type="monotone"
-              stroke="var(--color-mobile)"
+              stroke="var(--color-forecastedGeneration)"
               strokeWidth={2}
               dot={false}
             />
           </LineChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter>
+      {/* <CardFooter>
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 leading-none font-medium">
@@ -94,7 +131,7 @@ export function MultiLineChart() {
             </div>
           </div>
         </div>
-      </CardFooter>
+      </CardFooter> */}
     </Card>
-  )
+  );
 }
