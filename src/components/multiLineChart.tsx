@@ -1,7 +1,7 @@
 "use client";
 
 // import { TrendingUp } from "lucide-react";
-import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import { Bar, CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { ChartData } from "@/lib/types";
 
 import {
@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/card";
 import {
   ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
@@ -24,11 +26,11 @@ export const description = "A multiple line chart";
 
 const chartConfig = {
   actualGeneration: {
-    label: "Actual value",
+    label: "Actual value (MW)",
     color: "var(--chart-1)",
   },
   forecastedGeneration: {
-    label: "Forecasted value",
+    label: "Forecasted value (MW)",
     color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
@@ -64,18 +66,20 @@ export function MultiLineChart({
   return (
     <Card className="w-[95%] md:w-[80%] md:h-[63%] mt-20 md:my-10">
       <CardHeader>
-        <CardTitle>Forecast for Jan 2024</CardTitle>
+        <CardTitle>Power Generation Chart</CardTitle>
         <CardDescription>
-          {date?.from ? date.from.toDateString() : ""} -{" "}
-          {date?.to ? date.to.toDateString() : ""}
+          {`From
+          ${date?.from ? date.from.toDateString() : ""} -
+          ${date?.to ? date.to.toDateString() : ""}`}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer
-          className="w-full md:h-[75%]"
-          config={chartConfig}
-        >
-          <LineChart className="-ml-5 md:mt-8" accessibilityLayer data={chartData}>
+        <ChartContainer className="w-full md:h-[75%]" config={chartConfig}>
+          <LineChart
+            className="-ml-5 md:mt-8"
+            accessibilityLayer
+            data={chartData}
+          >
             <CartesianGrid vertical={false} />
             <YAxis
               tickLine={false}
@@ -101,6 +105,7 @@ export function MultiLineChart({
               content={<ChartTooltipContent />}
               labelFormatter={(value) => new Date(value).toLocaleString()}
             />
+            <ChartLegend content={<ChartLegendContent />} />
             <Line
               dataKey="actualGeneration"
               type="monotone"
@@ -118,6 +123,7 @@ export function MultiLineChart({
           </LineChart>
         </ChartContainer>
       </CardContent>
+
       {/* <CardFooter>
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
