@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
+// import { TrendingUp } from "lucide-react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { ChartData } from "@/lib/types";
 
@@ -62,7 +62,7 @@ export function MultiLineChart({
   date: DateRange | undefined;
 }) {
   return (
-    <Card className="w-[95%] md:w-[60%] mt-10">
+    <Card className="w-[95%] md:w-[80%] md:h-[63%] mt-20 md:my-10">
       <CardHeader>
         <CardTitle>Forecast for Jan 2024</CardTitle>
         <CardDescription>
@@ -71,31 +71,29 @@ export function MultiLineChart({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <LineChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              left: 0,
-              right: 12,
-            }}
-          >
+        <ChartContainer
+          className="w-full md:h-[75%]"
+          config={chartConfig}
+        >
+          <LineChart className="-ml-5 md:mt-8" accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <YAxis
               tickLine={false}
               axisLine={false}
               tickMargin={8}
+              tickCount={6}
               tickFormatter={(value) =>
                 value === 0 ? "0" : `${value / 1000}k`
               }
             />
             <XAxis
               dataKey="startTime"
-              type="category"
+              // type="category"
               // interval="preserveStartEnd"
               tickLine={true}
               axisLine={false}
               tickMargin={8}
+              minTickGap={30}
               tickFormatter={formatXAxis}
             />
             <ChartTooltip
